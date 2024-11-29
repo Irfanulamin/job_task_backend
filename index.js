@@ -55,6 +55,51 @@ async function run() {
       }
     });
 
+    // UPDATE OPERATION
+    app.put("/update-package/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const { title, description } = req.body;
+
+        if (!title || !description) {
+          return res.status(400).json({
+            STATUS: "FAIL",
+            MESSAGE: "Title and description are required",
+            ERROR: "Invalid input",
+            DATA: null,
+          });
+        }
+
+        const result = await apiCollection.updateOne(filter, {
+          $set: { title, description },
+        });
+
+        if (result.matchedCount === 0) {
+          return res.status(404).json({
+            STATUS: "FAIL",
+            MESSAGE: "Package not found",
+            ERROR: "Not found",
+            DATA: null,
+          });
+        }
+
+        return res.status(200).json({
+          STATUS: "OK",
+          MESSAGE: "Package has been updated!",
+          ERROR: null,
+          DATA: result,
+        });
+      } catch (error) {
+        return res.status(500).json({
+          STATUS: "ERROR",
+          MESSAGE: "Failed to update package product.",
+          ERROR: error.message,
+          DATA: null,
+        });
+      }
+    });
+
     // GET OPERATION
     app.get("/packages", async (req, res) => {
       try {
