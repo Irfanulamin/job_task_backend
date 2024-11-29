@@ -18,7 +18,7 @@ const client = new MongoClient(uri, {
   }
 });
 
-const collection = client.db("Backendtest").collection("api");
+const apiCollection = client.db("Backendtest").collection("api");
 
 async function run() {
   try {
@@ -26,9 +26,32 @@ async function run() {
     await client.connect();
     await client.db("admin").command({ ping: 1 });
     
+    app.post("/create-package", async (req, res) => {
+        try {
+          const createdPackageProduct = req.body;
+          const result = await apiCollection.insertOne(createdPackageProduct);
+      
+          return res.status(200).json({
+            STATUS: "OK",
+            MESSAGE: "Package has been created!",
+            ERROR: null,
+            DATA: result,
+          });
+        } catch (error) {
+
+          return res.status(500).json({
+            STATUS: "ERROR",
+            MESSAGE: "Failed to create package product.",
+            ERROR: error.message,
+            DATA: null,
+          });
+        }
+      });
+  
+      
 
   } finally {
-    await client.close();
+   // await client.close();
   }
 }
 run().catch(console.dir);
