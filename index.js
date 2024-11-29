@@ -100,6 +100,40 @@ async function run() {
       }
     });
 
+    // DELETE OPERATION
+    app.delete("/delete-package/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const query = { _id: new ObjectId(id) };
+
+        const result = await apiCollection.deleteOne(query);
+
+        if (result.deletedCount === 0) {
+          return res.status(404).json({
+            STATUS: "FAIL",
+            MESSAGE: "Package not found",
+            ERROR: "Not found",
+            DATA: null,
+          });
+        }
+
+        return res.status(200).json({
+          STATUS: "OK",
+          MESSAGE: "Package has been deleted!",
+          ERROR: null,
+          DATA: result,
+        });
+      } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({
+          STATUS: "ERROR",
+          MESSAGE: "Failed to delete package product.",
+          ERROR: error.message,
+          DATA: null,
+        });
+      }
+    });
+
     // GET OPERATION
     app.get("/packages", async (req, res) => {
       try {
