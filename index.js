@@ -28,6 +28,14 @@ async function run() {
     
     app.post("/create-package", async (req, res) => {
         try {
+            if (!title || !description) {
+                return res.status(400).json({
+                    STATUS: "FAIL",
+                    MESSAGE: "Title and description are required",
+                    ERROR: "Invalid input",
+                    DATA: null,
+                });
+            }
           const createdPackageProduct = req.body;
           const result = await apiCollection.insertOne(createdPackageProduct);
       
