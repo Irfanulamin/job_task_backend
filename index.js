@@ -7,7 +7,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.MONGODB_ADMIN}:${process.env.MONGODB_PASS}@cluster0.femzxoy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -80,6 +80,39 @@ async function run() {
         return res.status(500).json({
           STATUS: "ERROR",
           MESSAGE: "Failed to fetch packages.",
+          ERROR: error.message,
+          DATA: null,
+        });
+      }
+    });
+
+    // GET BY ID
+    app.get("/packages/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+
+        const package = await apiCollection.findOne(query);
+
+        if (!package) {
+          return res.status(404).json({
+            STATUS: "FAIL",
+            MESSAGE: "Package not found",
+            ERROR: "Not Found",
+            DATA: null,
+          });
+        }
+
+        return res.status(200).json({
+          STATUS: "OK",
+          MESSAGE: "Package fetched successfully!",
+          ERROR: null,
+          DATA: package,
+        });
+      } catch (error) {
+        return res.status(500).json({
+          STATUS: "ERROR",
+          MESSAGE: "Failed to fetch package.",
           ERROR: error.message,
           DATA: null,
         });
